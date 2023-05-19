@@ -1,8 +1,10 @@
 from flask import Flask, request
 from bs4 import BeautifulSoup
 import requests
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/", methods=["GET", "POST"])
 def hello():
@@ -11,8 +13,8 @@ def hello():
 	if request.method == "POST":
 
 		# Store the user inputs in variables
-		job_position = request.json["job_position"]
-		job_location = request.json["job_location"]
+		job_position = request.json["jobPosition"]
+		job_location = request.json["jobLocation"]
 
 		# URL of the web site from which the job profiles will be scraped
 		url = f'https://www.timesjobs.com/candidate/job-search.html?searchType=personalizedSearch&from=submit&txtKeywords={job_position}&txtLocation={job_location}'
