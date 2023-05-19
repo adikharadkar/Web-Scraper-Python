@@ -6,32 +6,57 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def hello():
+
+	# Scrape the job profiles if it is POST request
 	if request.method == "POST":
+
+		# Store the user inputs in variables
 		job_position = request.json["job_position"]
 		job_location = request.json["job_location"]
 
+		# URL of the web site from which the job profiles will be scraped
 		url = f'https://www.timesjobs.com/candidate/job-search.html?searchType=personalizedSearch&from=submit&txtKeywords={job_position}&txtLocation={job_location}'
+
+		# Access the website and store the result in a varibale
 		r = requests.get(url)
+
+		# Pass the source code of the webpage to BeautifulSoup for web scraping
 		soup = BeautifulSoup(r.content, 'lxml')
+
+		# Create an empty dictionary
 		d1 = {}
+
+		# Find all the <li> elements with the below class name
 		try:
 			lis = soup.find_all('li', class_='clearfix job-bx wht-shd-bx')
 		except:
+
+			# Print the error if element not found
 			print("Could not find job profiles!")
+
+		# Keep the count of the job profiles scraped
 		count = 0
+
+		# Loop through the list "lis"
 		for li in lis:
+
+			# Find and print the job position. Else print the error
 			try:
 				position = li.h2.find('a')
 				position = position.text.strip()
 				print(position)
 			except:
 				print("Position not available!")
+
+			# Find and print the company name
 			try:
 				company_name = li.find('h3', class_='joblist-comp-name')	
 				company_name = company_name.text.strip()
 				print(company_name)
 			except:
 				print("Company Name not available!")
+
+			# Find and print the experience
 			try:
 				experience = li.find('ul', class_='top-jd-dtl clearfix')
 				experience = experience.find_all('li')[0]
@@ -39,6 +64,8 @@ def hello():
 				print(experience)
 			except:
 				print("Experience not available!")
+
+			# Find and print the location
 			try:
 				location = li.find('ul', class_='top-jd-dtl clearfix')
 				location = location.find_all('li')[1].span
@@ -46,6 +73,8 @@ def hello():
 				print(location)
 			except:
 				print("Location not available!")
+
+			# Find and print the job description
 			try:
 				job_desc = li.find('ul', class_='list-job-dtl clearfix')
 				job_desc = job_desc.find_all('li')[0]
@@ -53,6 +82,8 @@ def hello():
 				print(job_desc)
 			except:
 				print("Job Description not available!")
+
+			# Find and print the apply link
 			try:
 				link = li.find('ul', class_='list-job-dtl clearfix')
 				link = link.li.find('a')
@@ -64,6 +95,7 @@ def hello():
 			print('-'*100)
 			count += 1
 
+			# Store the job results in a dictionary
 			d = {}
 			d["Position"] = position
 			d["Company Name"] = company_name
@@ -74,6 +106,7 @@ def hello():
 
 			d1[count] = d
 
+		# Return the dictionary as a response
 		return d1
 
 if __name__ == "__main__":
