@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from bs4 import BeautifulSoup
 import requests
 from flask_cors import CORS
@@ -26,7 +26,7 @@ def hello():
 		soup = BeautifulSoup(r.content, 'lxml')
 
 		# Create an empty dictionary
-		d1 = {}
+		d1 = []
 
 		# Find all the <li> elements with the below class name
 		try:
@@ -99,17 +99,18 @@ def hello():
 
 			# Store the job results in a dictionary
 			d = {}
+			d["id"] = count
 			d["Position"] = position
-			d["Company Name"] = company_name
-			d["experience"] = experience
+			d["CompanyName"] = company_name
+			d["Experience"] = experience
 			d["Location"] = location
-			d["Job Description"] = job_desc
-			d["Apply Link"] = link
+			d["JobDescription"] = job_desc
+			d["ApplyLink"] = link
 
-			d1[count] = d
+			d1.append(d)
 
 		# Return the dictionary as a response
-		return d1
+		return jsonify(d1)
 
 if __name__ == "__main__":
 	app.run(debug=True)
